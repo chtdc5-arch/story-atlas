@@ -18,11 +18,13 @@
       <div class="sidebar-footer"><button id="settingsBtn" class="side-button">⚙ 系統設定</button><small>單人工作庫・本機保存</small></div>
     </aside>
     <main class="main">
-      <header class="topbar"><div id="breadcrumb">創作總覽</div><div class="top-actions"><button id="importBtn" class="quiet">匯入</button><button id="exportBtn" class="quiet">匯出</button><button id="resetBtn" class="quiet">清空</button><button id="primaryAction" class="primary">＋ 建立作品</button><input id="fileImport" type="file" accept="application/json" hidden /></div></header>
+      <header class="topbar"><div id="breadcrumb">創作總覽</div><div class="top-actions"><button id="syncBtn" class="quiet">雲端同步</button><button id="importBtn" class="quiet">匯入</button><button id="exportBtn" class="quiet">匯出</button><button id="resetBtn" class="quiet">清空</button><button id="primaryAction" class="primary">＋ 建立作品</button><input id="fileImport" type="file" accept="application/json" hidden /></div></header>
       <section id="app" class="content"></section>
     </main>
   </div>
   <div id="modalRoot"></div><div id="toast" class="toast"></div>
-  <script src="app.js?v=20260814-obsidian"></script>
+  <script src="supabase-config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="app.js?v=20260814-sync"></script>
 </body>
 </html>
