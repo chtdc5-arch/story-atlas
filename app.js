@@ -22,10 +22,14 @@
   function esc(v=''){ return String(v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c])); }
   function markdown(source=''){
     const inline=s=>esc(s).replace(/\[\[([^\]]+)\]\]/g,'<a class="wiki-link">$1</a>').replace(/`([^`]+)`/g,'<code>$1</code>').replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>').replace(/__([^_]+)__/g,'<strong>$1</strong>').replace(/\*([^*]+)\*/g,'<em>$1</em>');
+    const cells=line=>line.trim().replace(/^\|/,'').replace(/\|$/,'').split('|').map(x=>x.trim());
     const lines=String(source).split(/\r?\n/), out=[]; let listType=null;
     const close=()=>{if(listType){out.push(`</${listType}>`);listType=null;}};
     for(let i=0;i<lines.length;i++){
       const t=lines[i].trim(); if(!t){close();continue;}
+      if(t.includes('|') && i+1<lines.length && /^\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?$/.test(lines[i+1].trim())){
+        close(); const headers=cells(t); i+=2; const rows=[]; while(i<lines.length && lines[i].trim().includes('|') && lines[i].trim()){rows.push(cells(lines[i]));i++;} i--; out.push(`<div class="table-scroll"><table><thead><tr>${headers.map(x=>`<th>${inline(x)}</th>`).join('')}</tr></thead><tbody>${rows.map(row=>`<tr>${headers.map((_,n)=>`<td>${inline(row[n]||'')}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`); continue;
+      }
       const h=t.match(/^(#{1,4})\s+(.+)$/);if(h){close();out.push(`<h${h[1].length}>${inline(h[2])}</h${h[1].length}>`);continue;}
       const ol=t.match(/^\d+\.\s+(.+)$/);if(ol){if(listType!=='ol'){close();out.push('<ol>');listType='ol';}out.push(`<li>${inline(ol[1])}</li>`);continue;}
       const ul=t.match(/^[-*]\s+(.+)$/);if(ul){if(listType!=='ul'){close();out.push('<ul>');listType='ul';}out.push(`<li>${inline(ul[1])}</li>`);continue;}
