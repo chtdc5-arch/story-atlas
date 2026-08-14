@@ -30,6 +30,7 @@
       if(t.includes('|') && i+1<lines.length && /^\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?$/.test(lines[i+1].trim())){
         close(); const headers=cells(t); i+=2; const rows=[]; while(i<lines.length && lines[i].trim().includes('|') && lines[i].trim()){rows.push(cells(lines[i]));i++;} i--; out.push(`<div class="table-scroll"><table><thead><tr>${headers.map(x=>`<th>${inline(x)}</th>`).join('')}</tr></thead><tbody>${rows.map(row=>`<tr>${headers.map((_,n)=>`<td>${inline(row[n]||'')}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`); continue;
       }
+      if(/^(---+|\*\*\*+|___+)$/.test(t)){close();out.push('<hr class="markdown-divider">');continue;}
       const h=t.match(/^(#{1,4})\s+(.+)$/);if(h){close();out.push(`<h${h[1].length}>${inline(h[2])}</h${h[1].length}>`);continue;}
       const ol=t.match(/^\d+\.\s+(.+)$/);if(ol){if(listType!=='ol'){close();out.push('<ol>');listType='ol';}out.push(`<li>${inline(ol[1])}</li>`);continue;}
       const ul=t.match(/^[-*]\s+(.+)$/);if(ul){if(listType!=='ul'){close();out.push('<ul>');listType='ul';}out.push(`<li>${inline(ul[1])}</li>`);continue;}
