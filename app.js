@@ -22,7 +22,10 @@
     ['overview','⌂','創作總覽'], ['episodes','▤','寫作內容'], ['characters','♙','角色資料庫'], ['scenes','⌘','場景資料庫'], ['assets','◫','圖像資產']
   ];
   const labels = Object.fromEntries(nav.map(x=>[x[0],x[2]]));
-  function renderNav(){ document.querySelector('#sidebarNav').innerHTML = nav.map(([id,icon,label])=>`<button class="${state.view===id?'active':''}" data-view="${id}"><span>${icon}</span>${label}</button>`).join(''); }
+  function renderNav(){
+    const item=([id,icon,label])=>`<button class="${state.view===id?'active':''}" data-view="${id}"><span>${icon}</span><em>${label}</em></button>`;
+    document.querySelector('#sidebarNav').innerHTML = `<div class="nav-primary">${item(nav[0])}</div><div class="nav-section">創作內容</div>${item(nav[1])}<div class="nav-section">世界設定</div>${nav.slice(2).map(item).join('')}`;
+  }
   function renderWorkMenu(){
     const current=work(); document.querySelector('#workSelect').innerHTML=current?`${esc(current.title)} <b>⌄</b>`:'請選擇作品 <b>⌄</b>';
     document.querySelector('#workMenu').innerHTML = state.works.length ? state.works.map(w=>`<button data-select-work="${w.id}"><strong>${esc(w.title)}</strong><small>${esc(w.status)}・${w.episodes.length} 話</small></button>`).join('') : '<div class="empty" style="min-height:90px;border:0;padding:10px"><small>尚未建立作品</small></div>';
