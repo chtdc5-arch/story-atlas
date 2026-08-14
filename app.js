@@ -188,6 +188,13 @@ if (selectedWork && lastView !== 'overview') {
    這層讓未登入使用者也能先完整使用；登入同步會沿用相同資料格式。
 ───────────────────────────────────────────────────────────── */
 const EDITOR_KEY = 'story-atlas-editor-data-v1';
+const RESET_MARKER = 'story-atlas-empty-reset-20260814';
+if (!localStorage.getItem(RESET_MARKER)) {
+  localStorage.removeItem(EDITOR_KEY);
+  localStorage.removeItem(STORAGE_KEY);
+  localStorage.setItem(EDITOR_KEY, JSON.stringify({ episodes: [], characters: [], scenes: [], assets: [] }));
+  localStorage.setItem(RESET_MARKER, 'done');
+}
 const starterData = {
   episodes: [{ id: 'ep-1', no: 1, title: '我只是看個小說，怎麼成了必死反派？', outline: '楚云曦穿越成為大雍監國長公主，原著中注定被紀淵以謀逆罪處死。她必須在 365 日內提升亡國指數，卻不能提前死亡。', novel: '我只是看個小說，怎麼成了必死反派？\n\n楚云曦只是想看完一本小說，卻在闔上書的瞬間，成了書中注定被處死的監國長公主。\n\n她看著銅鏡裡陌生的臉，腦中只剩一個念頭：先活過今天。', comic: '分鏡 1｜現代公司夜景｜楚云曦伏案閱讀。\n分鏡 2｜特寫｜書頁上的死亡結局。\n分鏡 3｜長公主寢殿｜楚云曦驚醒。', video: '場次 1｜現代公司・夜\n鏡頭：由窗外推入辦公桌。\n旁白：她只是看個小說。\n\n場次 2｜長公主寢殿\n台詞：這裡是哪裡？', versions: [{ version: 4, note: '加入三日限期', at: '今天 14:32' }, { version: 3, note: '調整紀淵登場動機', at: '昨天 21:08' }] }],
   characters: [{ id: 'ch-1', name: '楚云曦', alias: '監國長公主', identity: '大雍監國長公主／現代企業管理者', personality: '冷靜、果斷、擅長拆解問題', appearance: '黑長髮、鳳眼、身形修長', relations: '與紀淵互相試探；玉珠是貼身女官', episodes: '第 1 話', prompt: '古風長公主，黑長髮，鳳眼，沉著神情' }, { id: 'ch-2', name: '紀淵', alias: '攝政王', identity: '大雍攝政王', personality: '克制、重證據與規矩', appearance: '高大，黑衣，眉眼銳利', relations: '楚云曦的主要對手', episodes: '第 1 話', prompt: '古風攝政王，黑衣，冷峻，宮廷光影' }],
