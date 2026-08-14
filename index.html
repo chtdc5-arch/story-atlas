@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>卷宗台｜小說 IP 管理庫</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Noto+Serif+TC:wght@500;600;700;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand-mark"><span>卷</span><div><strong>卷宗台</strong><small>STORY ATLAS</small></div></div>
+        <div class="workspace-switcher"><small>目前工作庫</small><strong>我的小說宇宙</strong><span>⌄</span></div>
+        <nav>
+          <button class="nav-item active" data-view="overview"><span>⌂</span>總覽</button>
+          <button class="nav-item" data-view="episodes"><span>▤</span>話數管理</button>
+          <button class="nav-item" data-view="characters"><span>♙</span>角色資料庫</button>
+          <button class="nav-item" data-view="scenes"><span>⌘</span>場景資料庫</button>
+          <button class="nav-item" data-view="assets"><span>◫</span>圖檔資產庫</button>
+        </nav>
+        <div class="sidebar-bottom">
+          <div class="sync-status"><i></i><div><strong>已同步</strong><small>最後更新 2 分鐘前</small></div></div>
+          <button class="nav-item"><span>⚙</span>系統設定</button>
+          <div class="profile"><div class="avatar">云</div><div><strong>楚云曦</strong><small>個人工作者</small></div><span>⋯</span></div>
+        </div>
+      </aside>
+
+      <main class="main-content">
+        <header class="topbar"><div class="crumb">我的小說宇宙 <span>/</span> 總覽</div><div class="top-actions"><button class="icon-btn">⌕</button><button class="icon-btn">◔</button><button class="primary-btn" id="newEpisode">＋ 新增話數</button></div></header>
+
+        <section class="view active" id="overview">
+          <div class="page-heading"><div><p class="eyebrow">WORKSPACE OVERVIEW</p><h1>小說 IP 管理庫</h1><p class="subtitle">把故事、角色、場景與跨媒體版本，整理成一套可以持續生長的世界。</p></div><button class="quiet-btn">匯出工作報告 ↗</button></div>
+          <section class="project-hero">
+            <div class="project-cover"><div class="cover-kicker">大雍．亡國倒數</div><div class="cover-title">我只是看個小說，<br><em>怎麼成了必死反派？</em></div><div class="cover-footer"><span>第 1 話</span><span>・</span><span>連載中</span></div></div>
+            <div class="project-detail"><div class="detail-top"><div><p class="eyebrow">CURRENT PROJECT</p><h2>我只是看個小說，怎麼成了必死反派？</h2></div><span class="status live">連載中</span></div><p>現代高階管理者楚云曦過勞穿越，成為原著中注定被攝政王處死的監國長公主。她的第一個任務：三日內查明三十萬兩北境軍餉去向。</p><div class="project-meta"><div><small>目前話數</small><strong>1 <i>/ 12</i></strong></div><div><small>最後更新</small><strong>今天 14:32</strong></div><div><small>內容狀態</small><strong>大綱完成</strong></div></div><button class="dark-btn" data-view-target="episodes">繼續編輯第 1 話 <span>→</span></button></div>
+          </section>
+
+          <div class="section-label"><h2>版本製作進度</h2><span>Episode 01 / 3 formats</span></div>
+          <section class="progress-grid"><div class="progress-item"><div class="progress-icon novel">Aa</div><div class="progress-copy"><div><strong>網路小說版</strong><span>草稿中</span></div><small>完整文字內容與版本修訂</small><div class="bar"><i style="width:62%"></i></div><div class="progress-foot"><span>62%</span><span>第 4 版</span></div></div></div><div class="progress-item"><div class="progress-icon comic">▦</div><div class="progress-copy"><div><strong>漫畫版</strong><span>規劃中</span></div><small>分鏡、格數與生成圖</small><div class="bar"><i style="width:28%"></i></div><div class="progress-foot"><span>28%</span><span>8 / 24 格</span></div></div></div><div class="progress-item"><div class="progress-icon video">▶</div><div class="progress-copy"><div><strong>影片版</strong><span>尚未開始</span></div><small>場次、鏡頭與影片提示詞</small><div class="bar muted"><i style="width:4%"></i></div><div class="progress-foot"><span>4%</span><span>腳本未建立</span></div></div></div></section>
+
+          <div class="dashboard-columns"><section class="recent-panel"><div class="section-label"><h2>最近更新</h2><button class="text-btn">查看全部 →</button></div><div class="recent-list"><button class="recent-row" data-view-target="episodes"><span class="row-index">01</span><span class="row-main"><strong>我只是看個小說，怎麼成了必死反派？</strong><small>第 1 話・大綱修訂</small></span><span class="row-time">2 分鐘前</span><span>→</span></button><button class="recent-row" data-view-target="characters"><span class="row-index gold">02</span><span class="row-main"><strong>楚云曦</strong><small>新增「正式朝服」服裝設定</small></span><span class="row-time">昨天</span><span>→</span></button><button class="recent-row" data-view-target="scenes"><span class="row-index blue">03</span><span class="row-main"><strong>長公主府書房</strong><small>補充深夜燭光與平面圖備註</small></span><span class="row-time">昨天</span><span>→</span></button></div></section><section class="quick-panel"><div class="section-label"><h2>世界資料</h2><span>目前統計</span></div><div class="stats"><div><strong>06</strong><small>角色</small></div><div><strong>06</strong><small>場景</small></div><div><strong>34</strong><small>資產檔案</small></div><div><strong>18</strong><small>提示詞</small></div></div><div class="quote"><span>“</span><p>有權、有人、有資源。<br />最後被自己搞死。</p><small>— 楚云曦，原著讀後感</small></div></section></div>
+        </section>
+
+        <section class="view" id="episodes"><div class="page-heading"><div><p class="eyebrow">EPISODE WORKSPACE</p><h1>話數管理</h1><p class="subtitle">以同一個劇情核心，延伸成小說、漫畫與影片版本。</p></div><button class="primary-btn" id="newEpisode2">＋ 新增話數</button></div><div class="episode-layout"><div class="episode-list"><div class="list-head"><strong>第 1 季・亡國倒數</strong><span>1 / 12</span></div><button class="episode-row selected"><b>01</b><span><strong>我只是看個小說，怎麼成了必死反派？</strong><small>大綱完成・文字草稿中</small></span><i>⋯</i></button><button class="episode-row"><b>02</b><span><strong>第一個任務，查帳</strong><small>構思中</small></span><i>⋯</i></button><button class="episode-row"><b>03</b><span><strong>十二官案的影子</strong><small>構思中</small></span><i>⋯</i></button><button class="episode-row"><b>04</b><span><strong>攝政王的證據</strong><small>構思中</small></span><i>⋯</i></button></div><div class="episode-editor"><div class="editor-tabs"><button class="active">大綱</button><button>網路小說</button><button>漫畫</button><button>影片</button><span></span><button class="save-label">● 已保存</button></div><div class="editor-title"><span class="episode-number">第 1 話</span><h2>我只是看個小說，怎麼成了必死反派？</h2><span class="status draft">第 4 版</span></div><div class="outline-sections"><article><div class="outline-header"><span>01</span><h3>核心設定</h3><button>編輯</button></div><p>楚云曦穿越成為大雍監國長公主，原著中注定被紀淵以謀逆罪處死。她必須在 365 日內提升亡國指數，卻不能提前死亡。</p><div class="tag-line"><span>大雍</span><span>穿越</span><span>系統</span><span>高風險專案</span></div></article><article><div class="outline-header"><span>02</span><h3>劇情段落</h3><button>編輯</button></div><div class="scene-timeline"><div><i></i><span><strong>現代公司・晚上</strong><small>建立女主管理型人格</small></span></div><div><i></i><span><strong>長公主寢殿</strong><small>穿越與 365 日死亡規則</small></span></div><div><i></i><span><strong>長公主府書房</strong><small>紀淵登場，三十萬兩軍餉危機</small></span></div><div><i></i><span><strong>戶部官員住所</strong><small>結尾鉤子：親自查帳</small></span></div></div></article><article><div class="outline-header"><span>03</span><h3>本話邏輯暫檢</h3><button>查看紀錄</button></div><div class="check-list"><span>✓ 楚云曦閱讀原著的動機成立</span><span>✓ 紀淵登場與軍餉權責成立</span><span>✓ 殺意 92% 卻不直接殺人合理</span></div></article></div></div><aside class="inspector"><div class="inspector-title"><strong>關聯資料</strong><button>×</button></div><div class="inspector-section"><small>出場角色 <b>6</b></small><div class="mini-people"><span class="person portrait one">楚</span><span class="person portrait two">紀</span><span class="person portrait three">玉</span><span class="person portrait four">沈</span><span class="person more">+2</span></div></div><div class="inspector-section"><small>使用場景 <b>6</b></small><div class="linked-item"><span class="thumb palace"></span><span><strong>長公主府書房</strong><small>場景 5・深夜</small></span></div><div class="linked-item"><span class="thumb office"></span><span><strong>現代公司</strong><small>場景 1・晚上</small></span></div></div><div class="inspector-section"><small>版本紀錄</small><div class="version-row"><b>V4</b><span><strong>加入三日限期</strong><small>今天 14:32・目前版本</small></span></div><div class="version-row"><b>V3</b><span><strong>調整紀淵登場動機</strong><small>昨天 21:08</small></span></div><button class="outline-btn">查看完整版本歷史</button></div></aside></div></section>
+
+        <section class="view" id="characters"><div class="page-heading"><div><p class="eyebrow">CHARACTER CODEX</p><h1>角色資料庫</h1><p class="subtitle">角色、身份、關係與服裝設定集中管理。</p></div><button class="primary-btn">＋ 新增角色</button></div><div class="catalog-toolbar"><div class="search">⌕ <input placeholder="搜尋角色、別名或身份" /></div><div class="filter">全部角色⌄</div><div class="filter">出場話數⌄</div></div><div class="character-grid"><button class="character-card featured"><div class="character-art chu"><span>楚</span></div><div class="character-info"><div><h3>楚云曦</h3><small>監國長公主・原著反派</small></div><span class="count">01 話</span></div><p>現代企業高階管理者，穿越後面對亡國任務與提前死劫。</p><div class="outfit-pills"><span>日常服 01</span><span>正式服 02</span><span>劇情服 01</span></div></button><button class="character-card"><div class="character-art ji"><span>紀</span></div><div class="character-info"><div><h3>紀淵</h3><small>大雍攝政王</small></div><span class="count">01 話</span></div><p>掌軍政、邊防與部分刑獄，重證據與規矩。</p><div class="outfit-pills"><span>常服 01</span><span>朝服 01</span></div></button><button class="character-card"><div class="character-art yu"><span>玉</span></div><div class="character-info"><div><h3>玉珠</h3><small>楚云曦貼身女官</small></div><span class="count">01 話</span></div><p>忠心且最了解原身脾氣，因此比誰都怕長公主心平氣和。</p><div class="outfit-pills"><span>女官服 01</span></div></button><button class="character-card add-card"><span>＋</span><strong>新增角色</strong><small>建立角色與服裝設定</small></button></div></section>
+
+        <section class="view" id="scenes"><div class="page-heading"><div><p class="eyebrow">SCENE ATLAS</p><h1>場景資料庫</h1><p class="subtitle">保留地點、時間、天氣與每次使用的視覺一致性。</p></div><button class="primary-btn">＋ 新增場景</button></div><div class="scene-grid"><button class="scene-card large"><div class="scene-image study"><span>長公主府書房</span></div><div class="scene-card-body"><div><h3>長公主府書房</h3><small>宮廷／室內・深夜・燭光</small></div><span class="count">第 1 話・場景 5</span><p>滿桌帳冊、冷色月光與燭火交疊，是楚云曦第一次與紀淵正面交鋒的空間。</p></div></button><button class="scene-card"><div class="scene-image office"><span>現代公司</span></div><div class="scene-card-body"><div><h3>現代公司會議室</h3><small>現代／室內・晚上</small></div><span class="count">第 1 話・場景 1</span></div></button><button class="scene-card"><div class="scene-image chamber"><span>長公主寢殿</span></div><div class="scene-card-body"><div><h3>長公主寢殿</h3><small>宮廷／室內・白天</small></div><span class="count">第 1 話・場景 3</span></div></button></div></section>
+
+        <section class="view" id="assets"><div class="page-heading"><div><p class="eyebrow">ASSET LIBRARY</p><h1>圖檔資產庫</h1><p class="subtitle">角色、服裝、場景與生成版本，全部可搜尋、可追溯。</p></div><button class="primary-btn">↑ 上傳資產</button></div><div class="catalog-toolbar"><div class="search">⌕ <input placeholder="搜尋檔案、提示詞或標籤" /></div><div class="filter">全部類型⌄</div><div class="filter">最新生成⌄</div></div><div class="asset-grid"><div class="asset-card asset-chu"><span class="asset-type">角色立繪</span><div><strong>楚云曦・正式朝服</strong><small>第 1 話・生成版本 03</small></div></div><div class="asset-card asset-study"><span class="asset-type">場景設定圖</span><div><strong>長公主府書房</strong><small>深夜燭光・版本 02</small></div></div><div class="asset-card asset-ji"><span class="asset-type">角色參考圖</span><div><strong>紀淵・攝政王常服</strong><small>第 1 話・生成版本 01</small></div></div><div class="asset-card asset-floor"><span class="asset-type">平面圖</span><div><strong>長公主府書房・動線</strong><small>場景設定・版本 01</small></div></div></div></section>
+      </main>
+    </div>
+    <div class="toast" id="toast">已建立新的話數草稿</div>
+    <script src="supabase-config.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
