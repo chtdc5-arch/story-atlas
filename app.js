@@ -32,10 +32,10 @@
       if(t.startsWith('>')){
         close(); const quote=[]; while(i<lines.length && lines[i].trim().startsWith('>')){quote.push(lines[i].trim().replace(/^>\s?/,'').trim());i++;} i--;
         const callout=quote[0]?.match(/^\[!(note|info|tip|warning|danger|success|todo)\]\s*(.*)$/i);
-        if(callout){const kind=callout[1].toLowerCase(), title=callout[2]||kind[0].toUpperCase()+kind.slice(1);out.push(`<aside class="callout callout-${kind}"><div class="callout-title"><span>✦</span>${inline(title)}</div><div class="callout-body">${quote.slice(1).filter(Boolean).map(inline).join('<br>')}</div></aside>`);}else out.push(`<blockquote>${quote.map(inline).join('<br>')}</blockquote>`);
+        if(callout){const kind=callout[1].toLowerCase(), title=callout[2]||kind[0].toUpperCase()+kind.slice(1);out.push(`<aside class="callout callout-${kind}"><div class="callout-title"><span>✦</span>${inline(title)}</div><div class="callout-body">${quote.slice(1).filter(Boolean).map(inline).join('<br>')}</div></aside>`);}else out.push(`<blockquote class="speech">${quote.map(inline).join('<br>')}</blockquote>`);
         continue;
       }
-      close();out.push(`<p>${inline(t)}</p>`);
+      close();const dialogue=/^(「|『|“|\").+[」』”\"]$/.test(t);out.push(`<p class="${dialogue?'dialogue':''}">${inline(t)}</p>`);
     }
     close(); return out.join('');
   }
