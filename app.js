@@ -277,6 +277,7 @@ if (settingsButton) settingsButton.onclick = () => {
 if (new URLSearchParams(location.search).get('reset') === '1') {
   localStorage.removeItem(EDITOR_KEY);
   localStorage.removeItem(STORAGE_KEY);
+  localStorage.setItem(EDITOR_KEY, JSON.stringify({ episodes: [], characters: [], scenes: [], assets: [] }));
   history.replaceState({}, '', location.pathname);
   location.reload();
 }
