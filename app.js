@@ -24,7 +24,20 @@
     const inline=s=>esc(s).replace(/\[\[([^\]]+)\]\]/g,'<a class="wiki-link">$1</a>').replace(/`([^`]+)`/g,'<code>$1</code>').replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>').replace(/__([^_]+)__/g,'<strong>$1</strong>').replace(/\*([^*]+)\*/g,'<em>$1</em>');
     const lines=String(source).split(/\r?\n/), out=[]; let listType=null;
     const close=()=>{if(listType){out.push(`</${listType}>`);listType=null;}};
-    lines.forEach(line=>{const t=line.trim(); if(!t){close();return;} const h=t.match(/^(#{1,4})\s+(.+)$/);if(h){close();out.push(`<h${h[1].length}>${inline(h[2])}</h${h[1].length}>`);return;} const ol=t.match(/^\d+\.\s+(.+)$/);if(ol){if(listType!=='ol'){close();out.push('<ol>');listType='ol';}out.push(`<li>${inline(ol[1])}</li>`);return;} const ul=t.match(/^[-*]\s+(.+)$/);if(ul){if(listType!=='ul'){close();out.push('<ul>');listType='ul';}out.push(`<li>${inline(ul[1])}</li>`);return;} if(t.startsWith('> ')){close();out.push(`<blockquote>${inline(t.slice(2))}</blockquote>`);return;} close();out.push(`<p>${inline(t)}</p>`);}); close(); return out.join('');
+    for(let i=0;i<lines.length;i++){
+      const t=lines[i].trim(); if(!t){close();continue;}
+      const h=t.match(/^(#{1,4})\s+(.+)$/);if(h){close();out.push(`<h${h[1].length}>${inline(h[2])}</h${h[1].length}>`);continue;}
+      const ol=t.match(/^\d+\.\s+(.+)$/);if(ol){if(listType!=='ol'){close();out.push('<ol>');listType='ol';}out.push(`<li>${inline(ol[1])}</li>`);continue;}
+      const ul=t.match(/^[-*]\s+(.+)$/);if(ul){if(listType!=='ul'){close();out.push('<ul>');listType='ul';}out.push(`<li>${inline(ul[1])}</li>`);continue;}
+      if(t.startsWith('>')){
+        close(); const quote=[]; while(i<lines.length && lines[i].trim().startsWith('>')){quote.push(lines[i].trim().replace(/^>\s?/,'').trim());i++;} i--;
+        const callout=quote[0]?.match(/^\[!(note|info|tip|warning|danger|success|todo)\]\s*(.*)$/i);
+        if(callout){const kind=callout[1].toLowerCase(), title=callout[2]||kind[0].toUpperCase()+kind.slice(1);out.push(`<aside class="callout callout-${kind}"><div class="callout-title"><span>✦</span>${inline(title)}</div><div class="callout-body">${quote.slice(1).filter(Boolean).map(inline).join('<br>')}</div></aside>`);}else out.push(`<blockquote>${quote.map(inline).join('<br>')}</blockquote>`);
+        continue;
+      }
+      close();out.push(`<p>${inline(t)}</p>`);
+    }
+    close(); return out.join('');
   }
   function work(){ return state.works.find(w => w.id === state.selectedWorkId) || null; }
   function list(){ return work()?.episodes || []; }
