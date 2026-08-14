@@ -6,12 +6,19 @@
   const empty = { works: [], selectedWorkId: null, view: 'overview' };
   let state = read();
   let editorFormat = 'outline';
+  let editorMode = 'write';
   let activeEpisodeId = null;
 
   function read(){ try { return { ...empty, ...(JSON.parse(localStorage.getItem(STORE)) || {}) }; } catch { return { ...empty }; } }
   function save(){ localStorage.setItem(STORE, JSON.stringify(state)); }
   function uid(prefix){ return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2,7)}`; }
   function esc(v=''){ return String(v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c])); }
+  function markdown(source=''){
+    const inline=s=>esc(s).replace(/\[\[([^\]]+)\]\]/g,'<a class="wiki-link">$1</a>').replace(/`([^`]+)`/g,'<code>$1</code>').replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>').replace(/__([^_]+)__/g,'<strong>$1</strong>').replace(/\*([^*]+)\*/g,'<em>$1</em>');
+    const lines=String(source).split(/\r?\n/), out=[]; let listType=null;
+    const close=()=>{if(listType){out.push(`</${listType}>`);listType=null;}};
+    lines.forEach(line=>{const t=line.trim(); if(!t){close();return;} const h=t.match(/^(#{1,4})\s+(.+)$/);if(h){close();out.push(`<h${h[1].length}>${inline(h[2])}</h${h[1].length}>`);return;} const ol=t.match(/^\d+\.\s+(.+)$/);if(ol){if(listType!=='ol'){close();out.push('<ol>');listType='ol';}out.push(`<li>${inline(ol[1])}</li>`);return;} const ul=t.match(/^[-*]\s+(.+)$/);if(ul){if(listType!=='ul'){close();out.push('<ul>');listType='ul';}out.push(`<li>${inline(ul[1])}</li>`);return;} if(t.startsWith('> ')){close();out.push(`<blockquote>${inline(t.slice(2))}</blockquote>`);return;} close();out.push(`<p>${inline(t)}</p>`);}); close(); return out.join('');
+  }
   function work(){ return state.works.find(w => w.id === state.selectedWorkId) || null; }
   function list(){ return work()?.episodes || []; }
   function stamp(){ return new Date().toLocaleString('zh-TW',{dateStyle:'medium',timeStyle:'short'}); }
@@ -44,7 +51,7 @@
   }
   function overview(){
     const current=work();
-    let body=state.works.length ? `<div class="work-list">${state.works.map(w=>`<button class="work-row" data-select-work="${w.id}"><span class="work-symbol">${esc(w.title.slice(0,1))}</span><span><strong>${esc(w.title)}</strong><small>${esc(w.status)}・${w.episodes.length} 話・${esc(w.updatedAt||'尚未更新')}</small></span><span class="progress"><i style="width:${Math.min(100,w.episodes.length*10)}%"></i><small>${w.episodes.length} 話內容</small></span><span class="tags"><b class="tag">${w.episodes.length?'小說':'待開始'}</b></span><span>→</span></button>`).join('')}</div>`:emptyBlock('尚未建立作品','建立作品後，所有創作項目會集中顯示在這裡。');
+    let body=state.works.length ? `<div class="work-list">${state.works.map(w=>`<div class="work-row" data-select-work="${w.id}"><span class="work-symbol">${esc(w.title.slice(0,1))}</span><span><strong>${esc(w.title)}</strong><small>${esc(w.status)}・${w.episodes.length} 話・${esc(w.updatedAt||'尚未更新')}</small></span><span class="progress"><i style="width:${Math.min(100,w.episodes.length*10)}%"></i><small>${w.episodes.length} 話內容</small></span><span class="tags"><b class="tag">${w.episodes.length?'小說':'待開始'}</b></span><button class="quiet mini" data-edit-work="${w.id}">編輯</button></div>`).join('')}</div>`:emptyBlock('尚未建立作品','建立作品後，所有創作項目會集中顯示在這裡。');
     const stats=current?[['話數',current.episodes.length],['角色',current.characters.length],['場景',current.scenes.length],['資產',current.assets.length]]:[['話數',0],['角色',0],['場景',0],['資產',0]];
     return `${heading('WORKSPACE OVERVIEW','小說創作管理庫','管理作品、內容版本與世界設定。',action('＋ 建立作品','primary','data-new-work'))}<div class="section-title"><h2>所有作品</h2><small>${state.works.length} 部作品</small></div>${body}<div class="section-title"><h2>目前作品資料</h2><small>${current?esc(current.title):'請先選擇作品'}</small></div><div class="stats">${stats.map(([k,v])=>`<div class="stat"><strong>${v}</strong><small>${k}</small></div>`).join('')}</div>`;
   }
@@ -53,7 +60,7 @@
     const eps=w.episodes; if(!activeEpisodeId || !eps.some(e=>e.id===activeEpisodeId)) activeEpisodeId=eps[0]?.id||null;
     const ep=eps.find(e=>e.id===activeEpisodeId);
     const side=eps.length?`<div class="episode-list"><div class="list-head"><strong>全部話數</strong><span>${eps.length}</span></div>${eps.map((e,i)=>`<button class="episode-row ${e.id===activeEpisodeId?'selected':''}" data-episode="${e.id}"><b>${String(i+1).padStart(2,'0')}</b><span><strong>${esc(e.title)}</strong><small>${esc(e.status||'構思中')}・第 ${e.versions?.length||1} 版</small></span><i>⋯</i></button>`).join('')}</div>`:emptyBlock('尚未建立話數','按右上角「新增話數」開始。');
-    const editor=ep?`<div class="editor"><div class="tabs">${[['outline','大綱'],['novel','網路小說'],['comic','漫畫'],['video','影片']].map(([k,l])=>`<button class="${editorFormat===k?'active':''}" data-format="${k}">${l}</button>`).join('')}</div><div class="editor-body"><div class="editor-head"><span class="number">第 ${ep.no} 話</span><h2>${esc(ep.title)}</h2><span class="version">V${ep.versions?.[0]?.version||1}</span></div><textarea id="contentEditor">${esc(ep[editorFormat]||'')}</textarea><div class="editor-footer"><small>本機保存・每次儲存會建立版本</small><button class="quiet" data-history>版本紀錄</button><button class="primary" data-save-content>儲存新版本</button></div></div></div>`:emptyBlock();
+    const editor=ep?`<div class="editor"><div class="tabs">${[['outline','大綱'],['novel','網路小說'],['comic','漫畫'],['video','影片']].map(([k,l])=>`<button class="${editorFormat===k?'active':''}" data-format="${k}">${l}</button>`).join('')}</div><div class="editor-body"><div class="editor-head"><span class="number">第 ${ep.no} 話</span><h2>${esc(ep.title)}</h2><span class="version">V${ep.versions?.[0]?.version||1}</span><button class="quiet mini" data-edit-episode="${ep.id}">編輯話數</button></div><div class="editor-mode"><button class="${editorMode==='write'?'active':''}" data-editor-mode="write">編輯原文</button><button class="${editorMode==='preview'?'active':''}" data-editor-mode="preview">預覽格式</button><small>Obsidian Markdown：**粗體**　1. 編號　- 清單　# 標題　&gt; 引用　[[連結]]</small></div>${editorMode==='write'?`<textarea id="contentEditor">${esc(ep[editorFormat]||'')}</textarea>`:`<article class="markdown-preview">${markdown(ep[editorFormat]||'尚未輸入內容')}</article>`}<div class="editor-footer"><small>本機保存・每次儲存會建立版本</small><button class="quiet" data-history>版本紀錄</button>${editorMode==='write'?'<button class="primary" data-save-content>儲存新版本</button>':''}</div></div></div>`:emptyBlock();
     return `${heading('WRITING CONTENT','寫作內容','同一話數可分別管理大綱、小說、漫畫與影片版本。',action('＋ 新增話數','primary','data-new-episode'))}<div class="episode-layout">${side}${editor}</div>`;
   }
   function characters(){ const w=work(); if(!w)return `${heading('CHARACTER CODEX','角色資料庫','請先選擇作品。')}${emptyBlock('尚未選擇作品')}`; return `${heading('CHARACTER CODEX','角色資料庫','角色、關係、服裝與出現話數集中管理。',action('＋ 新增角色','primary','data-new-character'))}<div class="toolbar"><div class="search">⌕<input id="searchCharacters" placeholder="搜尋姓名、別名或身份" /></div></div><div id="characterGrid" class="grid">${w.characters.length?w.characters.map(c=>`<button class="item" data-character="${c.id}"><h3>${esc(c.name)}</h3><small>${esc(c.alias||c.identity)}</small><p>${esc(c.personality||'尚未填寫個性')}</p><div class="meta">服裝 ${c.outfits?.length||0} 套・${esc(c.episodes||'未設定出現話數')}</div></button>`).join(''):emptyBlock('尚未建立角色')}</div>`; }
@@ -63,16 +70,20 @@
   function bindView(){
     document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>{state.view=b.dataset.view;save();render();});
     document.querySelectorAll('[data-select-work]').forEach(b=>b.onclick=()=>{state.selectedWorkId=b.dataset.selectWork;state.view='overview';save();render();toast('已切換目前作品');});
+    document.querySelectorAll('[data-edit-work]').forEach(b=>b.onclick=e=>{e.stopPropagation();openWork(workById(b.dataset.editWork));});
     document.querySelector('[data-go-overview]')?.addEventListener('click',()=>{state.view='overview';save();render();});
     document.querySelector('[data-new-work]')?.addEventListener('click',openWork);document.querySelector('[data-new-episode]')?.addEventListener('click',openEpisode);document.querySelector('[data-new-character]')?.addEventListener('click',openCharacter);document.querySelector('[data-new-scene]')?.addEventListener('click',openScene);document.querySelector('[data-new-asset]')?.addEventListener('click',openAsset);
     document.querySelectorAll('[data-episode]').forEach(b=>b.onclick=()=>{activeEpisodeId=b.dataset.episode;editorFormat='outline';render();});
     document.querySelectorAll('[data-format]').forEach(b=>b.onclick=()=>{editorFormat=b.dataset.format;render();});
+    document.querySelectorAll('[data-editor-mode]').forEach(b=>b.onclick=()=>{editorMode=b.dataset.editorMode;render();});
+    document.querySelector('[data-edit-episode]')?.addEventListener('click',()=>openEpisode(work()?.episodes.find(e=>e.id===activeEpisodeId)));
     document.querySelector('[data-save-content]')?.addEventListener('click',saveContent);document.querySelector('[data-history]')?.addEventListener('click',showHistory);
     document.querySelectorAll('[data-character]').forEach(b=>b.onclick=()=>openCharacter(work().characters.find(x=>x.id===b.dataset.character)));
     document.querySelectorAll('[data-scene]').forEach(b=>b.onclick=()=>openScene(work().scenes.find(x=>x.id===b.dataset.scene)));
     document.querySelectorAll('[data-asset]').forEach(b=>b.onclick=()=>openAsset(work().assets.find(x=>x.id===b.dataset.asset)));
     bindSearch('searchCharacters','characterGrid','[data-character]');bindSearch('searchScenes','sceneGrid','[data-scene]');bindSearch('searchAssets','assetGrid','[data-asset]');
   }
+  function workById(id){ return state.works.find(w=>w.id===id); }
   function bindSearch(inputId,gridId,selector){ const input=document.querySelector('#'+inputId);if(!input)return;input.oninput=()=>document.querySelectorAll('#'+gridId+' '+selector).forEach(x=>x.style.display=x.textContent.toLowerCase().includes(input.value.toLowerCase())?'':'none'); }
 
   function modal(title,desc,body,onSave,saveLabel='儲存',danger=false){ const root=document.querySelector('#modalRoot');root.innerHTML=`<div class="modal-backdrop"><div class="modal"><button class="modal-close">×</button><h2>${title}</h2><p>${desc}</p>${body}<div class="modal-actions"><button class="quiet" data-cancel>取消</button><button class="${danger?'danger':'primary'}" data-modal-save>${saveLabel}</button></div></div></div>`;const close=()=>root.innerHTML='';root.querySelector('.modal-close').onclick=close;root.querySelector('[data-cancel]').onclick=close;root.querySelector('.modal-backdrop').onclick=e=>{if(e.target===e.currentTarget)close();};root.querySelector('[data-modal-save]').onclick=()=>onSave(root,close); }
