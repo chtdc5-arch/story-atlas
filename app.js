@@ -267,3 +267,9 @@ document.querySelector('#assets .page-heading .primary-btn')?.addEventListener('
 
 document.querySelector('.quiet-btn')?.addEventListener('click',()=>{const m=atlasModal('建立新作品','先建立作品名稱，之後可從左側目前工作庫切換。',`<div class="atlas-form"><label>書名<input name="title" placeholder="輸入作品名稱"></label><label>簡介<textarea name="desc"></textarea></label><label>狀態<select name="status"><option>構思中</option><option>連載中</option><option>完結</option></select></label></div>`);m.modal.querySelector('.atlas-save').onclick=()=>{const title=m.modal.querySelector('[name=title]').value.trim();if(!title){notify('請輸入書名');return;}workOptions.push(`《${title}》`);m.close();notify('作品已建立；重新整理後會保留目前工作區');};});
 document.querySelector('.quiet-btn')?.addEventListener('contextmenu',e=>e.preventDefault());
+
+const settingsButton = document.querySelector('.sidebar-bottom .nav-item');
+if (settingsButton) settingsButton.onclick = () => {
+  const m = atlasModal('本機資料設定', '清除後會移除這個瀏覽器保存的作品、話數、角色、場景、資產與版本紀錄。雲端資料不會刪除。', `<div class="atlas-form"><p style="color:#a26d2f;line-height:1.7">這是不可復原的本機清除操作。若你要重新開始，請按下方確認。</p></div>`, '清除本機資料');
+  m.modal.querySelector('.atlas-save').onclick = () => { localStorage.removeItem(EDITOR_KEY); localStorage.removeItem(STORAGE_KEY); m.close(); location.reload(); };
+};
