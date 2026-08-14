@@ -8,9 +8,16 @@
   let editorFormat = 'outline';
   let editorMode = 'write';
   let activeEpisodeId = null;
+  const supabaseClient = window.supabase && window.STORY_ATLAS_SUPABASE ? window.supabase.createClient(window.STORY_ATLAS_SUPABASE.url, window.STORY_ATLAS_SUPABASE.anonKey) : null;
+  let syncCode = localStorage.getItem('story-atlas-sync-code') || '';
+  let syncTimer = null;
+  let syncing = false;
 
   function read(){ try { return { ...empty, ...(JSON.parse(localStorage.getItem(STORE)) || {}) }; } catch { return { ...empty }; } }
-  function save(){ localStorage.setItem(STORE, JSON.stringify(state)); }
+  function save(){ localStorage.setItem(STORE, JSON.stringify(state)); queueSync(); }
+  function queueSync(){ if(!syncCode || !supabaseClient || syncing)return; clearTimeout(syncTimer); syncTimer=setTimeout(pushCloud,900); }
+  async function pushCloud(){ if(!syncCode || !supabaseClient)return; syncing=true; const {error}=await supabaseClient.from('workspace_sync').upsert({workspace_key:syncCode,payload:state,updated_at:new Date().toISOString()},{onConflict:'workspace_key'}); syncing=false; if(error)toast('同步失敗：請確認同步資料表已建立'); else toast('已同步到雲端'); }
+  async function loadCloud(code,close){ if(!supabaseClient){toast('同步服務尚未載入');return;} syncCode=code.trim(); if(syncCode.length<8){toast('同步碼至少需要 8 個字元');return;} localStorage.setItem('story-atlas-sync-code',syncCode); syncing=true; const {data,error}=await supabaseClient.from('workspace_sync').select('payload,updated_at').eq('workspace_key',syncCode).maybeSingle(); syncing=false; if(error){toast('無法連線，請先執行 sync-schema.sql');return;} if(data?.payload){state={...empty,...data.payload};localStorage.setItem(STORE,JSON.stringify(state));close();render();toast('已載入雲端作品資料');}else{await pushCloud();close();toast('已建立新的雲端工作庫');} }
   function uid(prefix){ return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2,7)}`; }
   function esc(v=''){ return String(v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c])); }
   function markdown(source=''){
@@ -97,8 +104,10 @@
   function openAsset(existing=null){const w=work();if(!w)return toast('請先選擇作品');const a=existing||{};modal(existing?'編輯資產':'新增資產','可記錄檔案、類型、標籤、使用話數與 AI 生成提示詞。',`<div class="form-grid">${field('name','資產名稱／檔名',a.name)}${field('type','資產類型',a.type||'角色參考圖')}${field('tags','標籤',a.tags)}${field('episodes','使用話數與場次',a.episodes)}${field('prompt','AI 生成提示詞',a.prompt,'full',true)}<label class="full">圖片檔案<input type="file" name="file" accept="image/*"></label></div>`,async(root,close)=>{const file=root.querySelector('[name=file]').files[0];const item={...a,id:a.id||uid('asset'),name:root.querySelector('[name=name]').value.trim()||file?.name||'未命名資產',type:root.querySelector('[name=type]').value,tags:root.querySelector('[name=tags]').value,episodes:root.querySelector('[name=episodes]').value,prompt:root.querySelector('[name=prompt]').value};if(file){item.dataUrl=await new Promise(resolve=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.readAsDataURL(file);});}const i=w.assets.findIndex(x=>x.id===item.id);if(i<0)w.assets.push(item);else w.assets[i]=item;save();close();render();toast(existing?'資產已更新':'資產已建立');});}
 
   function resetLocal(){if(confirm('確定清空全部作品、話數、角色、場景、資產與版本紀錄？此操作無法復原。')){localStorage.clear();location.reload();}}
+  function syncSettings(){modal('雲端同步','在每台裝置輸入同一組同步碼，即可共用作品資料；不需要建立個人帳號。同步碼請使用長且難以猜測的字串。',`<div class="form-grid"><label class="full">同步碼<input name="syncCode" type="password" value="${esc(syncCode)}" placeholder="例如：story-atlas-你的專屬長密碼"></label><div class="full empty"><div><strong>目前狀態</strong><small>${syncCode?'已設定同步碼，儲存後會載入雲端資料。':'尚未連接雲端工作庫。'}</small></div></div></div>`,(root,close)=>loadCloud(root.querySelector('[name=syncCode]').value,close),'連接同步庫');}
   function settings(){modal('系統設定','單人工作庫不需要登入。建議定期匯出 JSON 備份。',`<div class="form-grid"><div class="full empty"><div><strong>本機資料保存</strong><small>資料只保存在這個瀏覽器；可用上方匯出／匯入跨裝置搬移。</small></div></div></div><div style="margin-top:18px"><button class="danger" data-wipe>清空全部本機資料</button></div>`,(root,close)=>close(),'關閉');document.querySelector('[data-wipe]')?.addEventListener('click',resetLocal);}
   document.querySelector('#workSelect').onclick=()=>document.querySelector('#workMenu').classList.toggle('open');
+  document.querySelector('#syncBtn').onclick=syncSettings;
   document.querySelector('#settingsBtn').onclick=settings;
   document.querySelector('#resetBtn').onclick=resetLocal;
   document.querySelector('#exportBtn').onclick=()=>download(`story-atlas-${new Date().toISOString().slice(0,10)}.json`,JSON.stringify(state,null,2));
@@ -107,4 +116,5 @@
   document.querySelector('#workMenu').onclick=e=>{const b=e.target.closest('[data-select-work]');if(b){state.selectedWorkId=b.dataset.selectWork;state.view='overview';save();render();document.querySelector('#workMenu').classList.remove('open');}};
   document.addEventListener('click',e=>{if(!e.target.closest('.workspace-switcher'))document.querySelector('#workMenu').classList.remove('open');});
   render();
+  if(syncCode) loadCloud(syncCode,()=>{});
 })();
