@@ -182,3 +182,88 @@ if (selectedWork && lastView !== 'overview') {
   setProjectMode(true, selectedWork);
   showView(lastView);
 }
+
+/* ─────────────────────────────────────────────────────────────
+   可操作工作區：本機資料與編輯器
+   這層讓未登入使用者也能先完整使用；登入同步會沿用相同資料格式。
+───────────────────────────────────────────────────────────── */
+const EDITOR_KEY = 'story-atlas-editor-data-v1';
+const starterData = {
+  episodes: [{ id: 'ep-1', no: 1, title: '我只是看個小說，怎麼成了必死反派？', outline: '楚云曦穿越成為大雍監國長公主，原著中注定被紀淵以謀逆罪處死。她必須在 365 日內提升亡國指數，卻不能提前死亡。', novel: '我只是看個小說，怎麼成了必死反派？\n\n楚云曦只是想看完一本小說，卻在闔上書的瞬間，成了書中注定被處死的監國長公主。\n\n她看著銅鏡裡陌生的臉，腦中只剩一個念頭：先活過今天。', comic: '分鏡 1｜現代公司夜景｜楚云曦伏案閱讀。\n分鏡 2｜特寫｜書頁上的死亡結局。\n分鏡 3｜長公主寢殿｜楚云曦驚醒。', video: '場次 1｜現代公司・夜\n鏡頭：由窗外推入辦公桌。\n旁白：她只是看個小說。\n\n場次 2｜長公主寢殿\n台詞：這裡是哪裡？', versions: [{ version: 4, note: '加入三日限期', at: '今天 14:32' }, { version: 3, note: '調整紀淵登場動機', at: '昨天 21:08' }] }],
+  characters: [{ id: 'ch-1', name: '楚云曦', alias: '監國長公主', identity: '大雍監國長公主／現代企業管理者', personality: '冷靜、果斷、擅長拆解問題', appearance: '黑長髮、鳳眼、身形修長', relations: '與紀淵互相試探；玉珠是貼身女官', episodes: '第 1 話', prompt: '古風長公主，黑長髮，鳳眼，沉著神情' }, { id: 'ch-2', name: '紀淵', alias: '攝政王', identity: '大雍攝政王', personality: '克制、重證據與規矩', appearance: '高大，黑衣，眉眼銳利', relations: '楚云曦的主要對手', episodes: '第 1 話', prompt: '古風攝政王，黑衣，冷峻，宮廷光影' }],
+  scenes: [{ id: 'sc-1', name: '長公主府書房', category: '宮廷／室內', time: '深夜', weather: '月光、燭光', description: '滿桌帳冊、冷色月光與燭火交疊，是楚云曦第一次與紀淵正面交鋒的空間。', prompt: '古代長公主府書房，深夜，燭光與月光，滿桌帳冊', episodes: '第 1 話・場景 5' }, { id: 'sc-2', name: '現代公司會議室', category: '現代／室內', time: '晚上', weather: '陰天', description: '玻璃帷幕、高樓與尚未結束的會議。', prompt: '現代高樓會議室，夜景，冷色螢光燈', episodes: '第 1 話・場景 1' }],
+  assets: []
+};
+let editorData;
+try { editorData = JSON.parse(localStorage.getItem(EDITOR_KEY)) || starterData; } catch { editorData = starterData; }
+const persistEditor = () => localStorage.setItem(EDITOR_KEY, JSON.stringify(editorData));
+let currentEpisodeId = editorData.episodes[0]?.id || null;
+let currentFormat = 'outline';
+
+const editorStyle = document.createElement('style');
+editorStyle.textContent = `.atlas-modal{position:fixed;inset:0;z-index:40;background:rgba(20,28,24,.58);display:none;align-items:center;justify-content:center;padding:18px}.atlas-modal.open{display:flex}.atlas-dialog{width:min(720px,100%);max-height:90vh;overflow:auto;background:#faf8f3;padding:28px;box-shadow:0 25px 80px rgba(0,0,0,.25)}.atlas-dialog h2{font:700 23px 'Noto Serif TC';margin:0 0 5px}.atlas-dialog>p{font-size:12px;color:#817f77;margin:0 0 20px}.atlas-close{float:right;border:0;background:transparent;font-size:22px;color:#817f77;cursor:pointer}.atlas-form{display:grid;gap:13px}.atlas-form label{font:10px 'DM Mono';color:#6d756e}.atlas-form input,.atlas-form textarea,.atlas-form select{display:block;width:100%;box-sizing:border-box;border:1px solid #d4d0c6;background:#fffdf8;padding:11px;margin-top:6px;font:13px 'Noto Serif TC';color:#202421}.atlas-form textarea{min-height:180px;resize:vertical;line-height:1.8}.atlas-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:20px}.atlas-editor{display:grid;gap:12px}.atlas-editor textarea{width:100%;min-height:360px;box-sizing:border-box;border:1px solid #d4d0c6;background:#fffdf8;padding:18px;font:14px 'Noto Serif TC';line-height:2;resize:vertical}.atlas-editor-actions{display:flex;align-items:center;gap:9px}.atlas-editor-actions span{margin-right:auto;font:10px 'DM Mono';color:#6f786e}.version-history{display:grid;gap:8px}.version-history div{display:flex;gap:12px;padding:11px;border-bottom:1px solid #e2ded5}.version-history b{font:11px 'DM Mono';color:#305342}.atlas-detail{display:grid;grid-template-columns:110px 1fr;gap:8px;font-size:12px}.atlas-detail b{font:10px 'DM Mono';color:#817f77}.atlas-detail span{line-height:1.6}@media(max-width:700px){.atlas-dialog{padding:20px}.atlas-detail{grid-template-columns:1fr}.atlas-detail b{margin-top:6px}}`;
+document.head.appendChild(editorStyle);
+
+function atlasModal(title, subtitle, content, saveText = '儲存') {
+  const modal = document.createElement('div'); modal.className = 'atlas-modal open';
+  modal.innerHTML = `<div class="atlas-dialog"><button class="atlas-close">×</button><h2>${title}</h2><p>${subtitle || ''}</p>${content}<div class="atlas-actions"><button class="outline-btn atlas-cancel">取消</button><button class="dark-btn atlas-save">${saveText}</button></div></div>`;
+  document.body.appendChild(modal); const close = () => modal.remove();
+  modal.querySelector('.atlas-close').onclick = close; modal.querySelector('.atlas-cancel').onclick = close;
+  modal.addEventListener('click', e => { if (e.target === modal) close(); });
+  return { modal, close };
+}
+const esc = value => String(value ?? '').replace(/[&<>"']/g, ch => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#039;' }[ch]));
+function selectedEpisode() { return editorData.episodes.find(e => e.id === currentEpisodeId) || editorData.episodes[0]; }
+
+function renderEpisodeList() {
+  const list = document.querySelector('.episode-list'); if (!list) return;
+  list.querySelectorAll('.episode-row').forEach(x => x.remove());
+  editorData.episodes.forEach((ep, index) => {
+    const row = document.createElement('button'); row.className = `episode-row ${ep.id === currentEpisodeId ? 'selected' : ''}`;
+    row.innerHTML = `<b>${String(index + 1).padStart(2,'0')}</b><span><strong>${esc(ep.title)}</strong><small>${ep.outline ? '大綱完成' : '構思中'}・${ep.novel ? '文字已建立' : '文字草稿中'}</small></span><i>⋯</i>`;
+    row.onclick = () => { currentEpisodeId = ep.id; currentFormat = 'outline'; renderEpisodeList(); renderEpisodeWorkspace(); };
+    list.appendChild(row);
+  });
+  const head = list.querySelector('.list-head span'); if (head) head.textContent = `${editorData.episodes.length} / 12`;
+}
+function renderEpisodeWorkspace() {
+  const ep = selectedEpisode(); const editor = document.querySelector('.episode-editor'); if (!ep || !editor) return;
+  const formatLabels = { outline:'大綱', novel:'網路小說', comic:'漫畫', video:'影片' };
+  const value = ep[currentFormat] || '';
+  editor.innerHTML = `<div class="editor-tabs">${Object.entries(formatLabels).map(([key,label]) => `<button class="${key===currentFormat?'active':''}" data-format="${key}">${label}</button>`).join('')}<span></span><button class="save-label">● 已保存</button></div><div class="editor-title"><span class="episode-number">第 ${ep.no} 話</span><h2>${esc(ep.title)}</h2><span class="status draft">第 ${ep.versions?.[0]?.version || 1} 版</span></div><div class="atlas-editor"><textarea aria-label="${formatLabels[currentFormat]}內容">${esc(value)}</textarea><div class="atlas-editor-actions"><span>本機保存・可建立修訂版本</span><button class="outline-btn" data-history>查看版本紀錄</button><button class="dark-btn" data-save-episode>儲存新版本</button></div></div>`;
+  editor.querySelectorAll('[data-format]').forEach(btn => btn.onclick = () => { currentFormat = btn.dataset.format; renderEpisodeWorkspace(); });
+  editor.querySelector('[data-save-episode]').onclick = () => {
+    const text = editor.querySelector('textarea').value; const previous = ep[currentFormat] || '';
+    if (text === previous) { notify('內容沒有變更'); return; }
+    ep[currentFormat] = text; ep.versions = ep.versions || []; ep.versions.unshift({ version: (ep.versions[0]?.version || 0) + 1, note: `更新${formatLabels[currentFormat]}內容`, at: new Date().toLocaleString('zh-TW') });
+    persistEditor(); renderEpisodeWorkspace(); renderEpisodeList(); notify('已儲存新版本，舊版本仍保留');
+  };
+  editor.querySelector('[data-history]').onclick = () => {
+    const history = (ep.versions || []).map(v => `<div><b>V${v.version}</b><span>${esc(v.note)}<br><small>${esc(v.at)}</small></span></div>`).join('') || '<p>尚無修訂紀錄</p>';
+    const m = atlasModal('版本紀錄', '每次儲存都會留下修訂時間與備註。', `<div class="version-history">${history}</div>`, '關閉'); m.modal.querySelector('.atlas-save').onclick = m.close;
+  };
+}
+
+function openNewEpisode() {
+  const m = atlasModal('新增話數', '建立後可在四種內容格式間切換編輯。', `<div class="atlas-form"><label>話數標題<input name="title" placeholder="例如：第一個任務，查帳" required></label><label>大綱<textarea name="outline" placeholder="這一話要發生什麼事？"></textarea></label></div>`);
+  m.modal.querySelector('.atlas-save').onclick = () => { const title=m.modal.querySelector('[name=title]').value.trim(); if(!title){notify('請先輸入話數標題');return;} const ep={id:`ep-${Date.now()}`,no:editorData.episodes.length+1,title,outline:m.modal.querySelector('[name=outline]').value,novel:'',comic:'',video:'',versions:[{version:1,note:'建立話數',at:new Date().toLocaleString('zh-TW')}]}; editorData.episodes.push(ep); currentEpisodeId=ep.id; currentFormat='outline'; persistEditor(); renderEpisodeList(); renderEpisodeWorkspace(); m.close(); showView('episodes'); notify('已建立話數，可開始編輯'); };
+}
+document.querySelectorAll('#newEpisode,#newEpisode2').forEach(button => { button.onclick = openNewEpisode; });
+renderEpisodeList(); renderEpisodeWorkspace();
+
+function openCharacterForm(existing = null) {
+  const c=existing || {}; const fields=[['name','姓名'],['alias','別名'],['identity','身份'],['personality','個性'],['appearance','年齡／身高／外貌特徵'],['relations','人物關係'],['episodes','出現話數'],['prompt','AI 生成提示詞']];
+  const content=`<div class="atlas-form">${fields.map(([key,label])=>`<label>${label}${key==='personality'||key==='appearance'||key==='relations'||key==='prompt'?`<textarea name="${key}">${esc(c[key])}</textarea>`:`<input name="${key}" value="${esc(c[key])}">`}</label>`).join('')}</div>`;
+  const m=atlasModal(existing?'編輯角色':'新增角色','角色資料與作品關聯會保存於本機。',content); m.modal.querySelector('.atlas-save').onclick=()=>{const item={id:c.id||`ch-${Date.now()}`}; fields.forEach(([key])=>item[key]=m.modal.querySelector(`[name=${key}]`).value.trim()); const i=editorData.characters.findIndex(x=>x.id===item.id); if(i<0) editorData.characters.push(item); else editorData.characters[i]=item; persistEditor(); renderCharacters(); m.close(); notify(existing?'角色資料已更新':'已新增角色');};
+}
+function renderCharacters(){const grid=document.querySelector('.character-grid'); if(!grid)return; grid.querySelectorAll('.character-card:not(.add-card)').forEach(x=>x.remove()); const add=grid.querySelector('.add-card'); editorData.characters.forEach((c,i)=>{const b=document.createElement('button');b.className=`character-card ${i===0?'featured':''}`;b.innerHTML=`<div class="character-art ${i%2?'ji':'chu'}"><span>${esc(c.name?.slice(0,1))}</span></div><div class="character-info"><div><h3>${esc(c.name)}</h3><small>${esc(c.identity||c.alias)}</small></div><span class="count">${esc(c.episodes||'未設定')}</span></div><p>${esc(c.personality||'尚未填寫個性')}</p><div class="outfit-pills"><span>點擊編輯資料</span></div>`;b.onclick=()=>openCharacterForm(c);grid.insertBefore(b,add);});add.onclick=()=>openCharacterForm();}
+const characterAdd=document.querySelector('#characters .page-heading .primary-btn'); if(characterAdd) characterAdd.onclick=()=>openCharacterForm(); const characterCardAdd=document.querySelector('.character-card.add-card'); if(characterCardAdd) characterCardAdd.onclick=()=>openCharacterForm(); renderCharacters();
+
+function openSceneForm(existing=null){const s=existing||{};const fields=[['name','場景名稱'],['category','地點分類'],['time','時間'],['weather','天氣'],['description','場景描述'],['prompt','AI 生成提示詞'],['episodes','使用話數與場次']];const content=`<div class="atlas-form">${fields.map(([k,l])=>`<label>${l}${['description','prompt'].includes(k)?`<textarea name="${k}">${esc(s[k])}</textarea>`:`<input name="${k}" value="${esc(s[k])}">`}</label>`).join('')}</div>`;const m=atlasModal(existing?'編輯場景':'新增場景','固定欄位讓場景可被搜尋與重複使用。',content);m.modal.querySelector('.atlas-save').onclick=()=>{const item={id:s.id||`sc-${Date.now()}`};fields.forEach(([k])=>item[k]=m.modal.querySelector(`[name=${k}]`).value.trim());const i=editorData.scenes.findIndex(x=>x.id===item.id);if(i<0)editorData.scenes.push(item);else editorData.scenes[i]=item;persistEditor();renderScenes();m.close();notify(existing?'場景已更新':'已新增場景');};}
+function renderScenes(){const grid=document.querySelector('.scene-grid');if(!grid)return;grid.innerHTML='';editorData.scenes.forEach((s,i)=>{const b=document.createElement('button');b.className=`scene-card ${i===0?'large':''}`;b.innerHTML=`<div class="scene-image ${i%2?'office':'study'}"><span>${esc(s.name)}</span></div><div class="scene-card-body"><div><h3>${esc(s.name)}</h3><small>${esc(s.category)}・${esc(s.time)}・${esc(s.weather)}</small></div><span class="count">${esc(s.episodes)}</span><p>${esc(s.description)}</p></div>`;b.onclick=()=>openSceneForm(s);grid.appendChild(b);});}
+const sceneAdd=document.querySelector('#scenes .page-heading .primary-btn');if(sceneAdd)sceneAdd.onclick=()=>openSceneForm();renderScenes();
+
+document.querySelector('#assets .page-heading .primary-btn')?.addEventListener('click',()=>{const m=atlasModal('新增圖像資產','可先記錄檔名、類型、標籤與生成提示詞，之後再補上檔案。',`<div class="atlas-form"><label>檔案名稱<input name="name" placeholder="例如：楚云曦_正式朝服_v03.png"></label><label>資產類型<select name="type"><option>角色立繪</option><option>服裝參考圖</option><option>場景設定圖</option><option>平面圖</option><option>漫畫生成圖</option></select></label><label>備註／提示詞<textarea name="note"></textarea></label></div>`);m.modal.querySelector('.atlas-save').onclick=()=>{const name=m.modal.querySelector('[name=name]').value.trim();if(!name){notify('請輸入檔案名稱');return;}editorData.assets.push({id:`asset-${Date.now()}`,name,type:m.modal.querySelector('[name=type]').value,note:m.modal.querySelector('[name=note]').value});persistEditor();m.close();notify('資產紀錄已建立');};});
+
+document.querySelector('.quiet-btn')?.addEventListener('click',()=>{const m=atlasModal('建立新作品','先建立作品名稱，之後可從左側目前工作庫切換。',`<div class="atlas-form"><label>書名<input name="title" placeholder="輸入作品名稱"></label><label>簡介<textarea name="desc"></textarea></label><label>狀態<select name="status"><option>構思中</option><option>連載中</option><option>完結</option></select></label></div>`);m.modal.querySelector('.atlas-save').onclick=()=>{const title=m.modal.querySelector('[name=title]').value.trim();if(!title){notify('請輸入書名');return;}workOptions.push(`《${title}》`);m.close();notify('作品已建立；重新整理後會保留目前工作區');};});
+document.querySelector('.quiet-btn')?.addEventListener('contextmenu',e=>e.preventDefault());
