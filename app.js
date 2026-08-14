@@ -273,3 +273,10 @@ if (settingsButton) settingsButton.onclick = () => {
   const m = atlasModal('本機資料設定', '清除後會移除這個瀏覽器保存的作品、話數、角色、場景、資產與版本紀錄。雲端資料不會刪除。', `<div class="atlas-form"><p style="color:#a26d2f;line-height:1.7">這是不可復原的本機清除操作。若你要重新開始，請按下方確認。</p></div>`, '清除本機資料');
   m.modal.querySelector('.atlas-save').onclick = () => { localStorage.removeItem(EDITOR_KEY); localStorage.removeItem(STORAGE_KEY); m.close(); location.reload(); };
 };
+
+if (new URLSearchParams(location.search).get('reset') === '1') {
+  localStorage.removeItem(EDITOR_KEY);
+  localStorage.removeItem(STORAGE_KEY);
+  history.replaceState({}, '', location.pathname);
+  location.reload();
+}
