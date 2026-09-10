@@ -2,7 +2,9 @@
   'use strict';
   const STORE = 'story-atlas-formal-v1';
   const RESET = 'story-atlas-formal-reset-v1';
+  const PUBLISHED_STORE = 'story-atlas-published-version';
   if (!localStorage.getItem(RESET)) { localStorage.clear(); localStorage.setItem(RESET, 'done'); }
+  const published = window.STORY_ATLAS_PUBLISHED_STATE || null;
   const empty = { works: [], selectedWorkId: null, view: 'overview' };
   let state = read();
   let editorFormat = 'outline';
@@ -13,7 +15,35 @@
   let syncTimer = null;
   let syncing = false;
 
-  function read(){ try { return { ...empty, ...(JSON.parse(localStorage.getItem(STORE)) || {}) }; } catch { return { ...empty }; } }
+  function clone(value){ return JSON.parse(JSON.stringify(value)); }
+  function read(){
+    try {
+      const saved=JSON.parse(localStorage.getItem(STORE)) || null;
+      if(!published?.state)return {...empty,...(saved||{})};
+      if(!saved?.works?.length){localStorage.setItem(PUBLISHED_STORE,published.version);return clone(published.state);}
+      if(localStorage.getItem(PUBLISHED_STORE)===published.version)return {...empty,...saved};
+      const next={...empty,...saved,works:[...(saved.works||[])]};
+      for(const publicWork of published.state.works){
+        const index=next.works.findIndex(item=>item.id===publicWork.id||item.title===publicWork.title);
+        if(index<0){next.works.push(clone(publicWork));continue;}
+        const localWork=next.works[index];
+        const localEpisodes=new Map((localWork.episodes||[]).map(item=>[Number(item.no),item]));
+        const publicNumbers=new Set(publicWork.episodes.map(item=>Number(item.no)));
+        const mergedEpisodes=publicWork.episodes.map(publicEpisode=>{
+          const localEpisode=localEpisodes.get(Number(publicEpisode.no));
+          return localEpisode?{...publicEpisode,...localEpisode,title:publicEpisode.title,status:publicEpisode.status,novel:publicEpisode.novel,outline:localEpisode.outline||publicEpisode.outline,updatedAt:publicEpisode.updatedAt}:{...publicEpisode};
+        });
+        mergedEpisodes.push(...(localWork.episodes||[]).filter(item=>!publicNumbers.has(Number(item.no))));
+        next.works[index]={...publicWork,...localWork,episodes:mergedEpisodes,updatedAt:publicWork.updatedAt};
+      }
+      next.selectedWorkId=next.selectedWorkId||published.state.selectedWorkId;
+      localStorage.setItem(PUBLISHED_STORE,published.version);
+      localStorage.setItem(STORE,JSON.stringify(next));
+      return next;
+    } catch {
+      return published?.state?clone(published.state):{...empty};
+    }
+  }
   function save(){ try { localStorage.setItem(STORE, JSON.stringify(state)); queueSync(); return true; } catch { toast('儲存失敗：圖片檔案過大，請重新選擇圖片'); return false; } }
   function queueSync(){ if(!syncCode || !supabaseClient || syncing)return; clearTimeout(syncTimer); syncTimer=setTimeout(pushCloud,900); }
   async function pushCloud(){ if(!syncCode || !supabaseClient)return; syncing=true; const {error}=await supabaseClient.from('workspace_sync').upsert({workspace_key:syncCode,payload:state,updated_at:new Date().toISOString()},{onConflict:'workspace_key'}); syncing=false; if(error)toast('同步失敗：請確認同步資料表已建立'); else toast('已同步到雲端'); }
