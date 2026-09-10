@@ -51,12 +51,12 @@
   function download(name,text,type='application/json'){ const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([text],{type})); a.download=name; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),500); }
 
   const nav = [
-    ['overview','⌂','創作總覽'], ['episodes','▤','寫作內容'], ['characters','♙','角色資料庫'], ['scenes','⌘','場景資料庫'], ['assets','◫','圖像資產']
+    ['overview','⌂','創作總覽'], ['roadmap','◇','四季藍圖'], ['episodes','▤','寫作內容'], ['characters','♙','角色資料庫'], ['scenes','⌘','場景資料庫'], ['assets','◫','圖像資產']
   ];
   const labels = Object.fromEntries(nav.map(x=>[x[0],x[2]]));
   function renderNav(){
     const item=([id,icon,label])=>`<button class="${state.view===id?'active':''}" data-view="${id}"><span>${icon}</span><em>${label}</em></button>`;
-    document.querySelector('#sidebarNav').innerHTML = `<div class="nav-primary">${item(nav[0])}</div><div class="nav-section">創作內容</div>${item(nav[1])}<div class="nav-section">世界設定</div>${nav.slice(2).map(item).join('')}`;
+    document.querySelector('#sidebarNav').innerHTML = `<div class="nav-primary">${item(nav[0])}</div><div class="nav-section">故事規劃</div>${item(nav[1])}<div class="nav-section">創作內容</div>${item(nav[2])}<div class="nav-section">世界設定</div>${nav.slice(3).map(item).join('')}`;
   }
   function renderWorkMenu(){
     const current=work(); document.querySelector('#workSelect').innerHTML=current?`${esc(current.title)} <b>⌄</b>`:'請選擇作品 <b>⌄</b>';
@@ -69,10 +69,11 @@
   function render(){
     renderNav(); renderWorkMenu();
     document.querySelector('#breadcrumb').textContent = labels[state.view] || '創作總覽';
-    const primary=document.querySelector('#primaryAction'); primary.textContent=state.view==='overview'?'＋ 建立作品':state.view==='episodes'?'＋ 新增話數':state.view==='characters'?'＋ 新增角色':state.view==='scenes'?'＋ 新增場景':state.view==='assets'?'＋ 新增資產':'＋ 新增';
-    primary.onclick=()=>state.view==='overview'?openWork():state.view==='episodes'?openEpisode():state.view==='characters'?openCharacter():state.view==='scenes'?openScene():openAsset();
-    const app=document.querySelector('#app'); app.innerHTML = state.view==='overview'?overview():state.view==='episodes'?episodes():state.view==='characters'?characters():state.view==='scenes'?scenes():assets();
+    const primary=document.querySelector('#primaryAction'); primary.textContent=state.view==='overview'?'＋ 建立作品':state.view==='roadmap'?'第 17 / 84 話':state.view==='episodes'?'＋ 新增話數':state.view==='characters'?'＋ 新增角色':state.view==='scenes'?'＋ 新增場景':state.view==='assets'?'＋ 新增資產':'＋ 新增';
+    primary.onclick=()=>state.view==='overview'?openWork():state.view==='roadmap'?window.StoryRoadmap?.focusCurrent():state.view==='episodes'?openEpisode():state.view==='characters'?openCharacter():state.view==='scenes'?openScene():openAsset();
+    const app=document.querySelector('#app'); app.innerHTML = state.view==='overview'?overview():state.view==='roadmap'?window.StoryRoadmap?.render()||'':state.view==='episodes'?episodes():state.view==='characters'?characters():state.view==='scenes'?scenes():assets();
     bindView();
+    if(state.view==='roadmap') window.StoryRoadmap?.bind();
   }
   function overview(){
     const current=work();
