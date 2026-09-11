@@ -17,9 +17,15 @@
     const script=document.createElement('script');
     script.src='published-story-data.js?v=20260910-17';
     script.onload=()=>{
-      document.body.classList.remove('reader-locked');
-      document.querySelector('#accessGate').classList.add('unlocked');
-      window.startStoryReader();
+      const overrides=document.createElement('script');
+      overrides.src='published-story-overrides.js?v=20260911';
+      overrides.onload=()=>{
+        document.body.classList.remove('reader-locked');
+        document.querySelector('#accessGate').classList.add('unlocked');
+        window.startStoryReader();
+      };
+      overrides.onerror=()=>{loading=false;error.textContent='修訂內容載入失敗，請稍後再試。';};
+      document.head.appendChild(overrides);
     };
     script.onerror=()=>{loading=false;error.textContent='內容載入失敗，請稍後再試。';};
     document.head.appendChild(script);
