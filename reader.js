@@ -29,7 +29,7 @@ window.startStoryReader = () => {
     const index=episodes.indexOf(episode);
     document.querySelector('#chapterKicker').textContent=`EPISODE ${String(episode.no).padStart(2,'0')} / ${String(episodes.length).padStart(2,'0')}`;
     document.querySelector('#chapterTitle').textContent=episode.title.replace(/^第\d+話[｜|]\s*/, '');
-    document.querySelector('#chapterStatus').textContent=`第 ${episode.no} 話・${episode.status||'修訂中'}・更新 2026-09-10`;
+    document.querySelector('#chapterStatus').textContent=`第 ${episode.no} 話・${episode.status||'修訂中'}・更新 ${episode.updatedAt||work.updatedAt||'—'}`;
     content.innerHTML=markdown(episode.novel);
     select.value=String(episode.no);
     list.querySelectorAll('button').forEach(button=>button.classList.toggle('active',Number(button.dataset.no)===Number(episode.no)));
