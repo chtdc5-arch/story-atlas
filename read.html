@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="《本宮要亡國，你們怎麼全升職了？》第1至17話線上閱讀。">
+  <title>本宮要亡國，你們怎麼全升職了？｜線上閱讀</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Noto+Serif+TC:wght@500;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="reader.css?v=20260910">
+</head>
+<body class="reader-locked">
+  <section class="access-gate" id="accessGate" aria-labelledby="accessTitle">
+    <div class="gate-mark">卷</div>
+    <p>PRIVATE READING ROOM</p>
+    <h1 id="accessTitle">讀者通行</h1>
+    <span>請輸入作者提供的共用密碼。</span>
+    <form id="accessForm">
+      <label for="accessPassword">共用密碼</label>
+      <div class="gate-input-row">
+        <input id="accessPassword" type="password" autocomplete="current-password" required autofocus>
+        <button type="submit">進入閱讀</button>
+      </div>
+      <small id="accessError" role="alert"></small>
+    </form>
+  </section>
+  <div class="reading-progress" id="readingProgress"></div>
+  <header class="reader-header">
+    <a class="reader-brand" href="read.html"><span>卷</span><strong>本宮要亡國，你們怎麼全升職了？</strong></a>
+    <div class="reader-actions">
+      <label for="chapterSelect">選擇話數</label>
+      <select id="chapterSelect" aria-label="選擇話數"></select>
+      <a href="index.html">創作資料庫</a>
+    </div>
+  </header>
+
+  <main class="reader-shell">
+    <aside class="reader-index" aria-label="話數目錄">
+      <p>EPISODE INDEX</p>
+      <h2>話數目錄</h2>
+      <nav id="chapterList"></nav>
+    </aside>
+
+    <article class="reader-article">
+      <div class="chapter-kicker" id="chapterKicker"></div>
+      <h1 id="chapterTitle"></h1>
+      <p class="chapter-status" id="chapterStatus"></p>
+      <div class="chapter-rule"><span></span></div>
+      <div class="novel-content" id="novelContent"></div>
+      <nav class="chapter-nav" aria-label="前後話導覽">
+        <button id="prevChapter">← 上一話</button>
+        <button id="nextChapter">下一話 →</button>
+      </nav>
+    </article>
+  </main>
+
+  <script src="reader.js?v=20260910"></script>
+  <script src="reader-auth.js?v=20260910"></script>
+</body>
+</html>
