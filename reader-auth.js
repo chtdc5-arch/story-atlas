@@ -18,7 +18,7 @@
     script.src='published-story-data.js?v=20260910-17';
     script.onload=()=>{
       const overrides=document.createElement('script');
-      overrides.src='published-story-overrides.js?v=20260911b';
+      overrides.src='published-story-overrides.js?v=20260916';
       overrides.onload=()=>{
         document.body.classList.remove('reader-locked');
         document.querySelector('#accessGate').classList.add('unlocked');
