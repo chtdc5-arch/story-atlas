@@ -6,7 +6,7 @@
   const input=document.querySelector('#siteAccessPassword');
   const error=document.querySelector('#siteAccessError');
   let loading=false;
-  const scripts=['supabase-config.js','https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2','roadmap-data.js?v=20260909','roadmap.js?v=20260909','published-story-data.js?v=20260910-17','published-story-overrides.js?v=20260916','app.js?v=20260910-17'];
+  const scripts=['supabase-config.js','https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2','roadmap-data.js?v=20260909','roadmap.js?v=20260909','published-story-data.js?v=20260910-17','published-story-overrides.js?v=20260916','published-comic-data.js?v=20260922-p01-p12','app.js?v=20260922-comic-pages'];
 
   async function digest(value){const bytes=new TextEncoder().encode(value);const hash=await crypto.subtle.digest('SHA-256',bytes);return [...new Uint8Array(hash)].map(item=>item.toString(16).padStart(2,'0')).join('');}
   function addScript(src){return new Promise((resolve,reject)=>{const script=document.createElement('script');script.src=src;script.onload=resolve;script.onerror=reject;document.body.appendChild(script);});}
