@@ -1,7 +1,7 @@
 (() => {
   'use strict';
   const published=window.STORY_ATLAS_PUBLISHED_STATE;
-  const work=published?.state?.works?.find(item=>item.title==='本宮要亡國，你們怎麼全升職了？');
+  const work=published?.state?.works?.find(item=>item.id==='work-1786697622274-tznnx');
   const episode=work?.episodes?.find(item=>Number(item.no)===1);
   if(!published || !episode)return;
   episode.comicPages=Array.from({length:16},(_,index)=>({
