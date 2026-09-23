@@ -31,7 +31,7 @@
         const publicNumbers=new Set(publicWork.episodes.map(item=>Number(item.no)));
         const mergedEpisodes=publicWork.episodes.map(publicEpisode=>{
           const localEpisode=localEpisodes.get(Number(publicEpisode.no));
-          return localEpisode?{...publicEpisode,...localEpisode,title:publicEpisode.title,status:publicEpisode.status,novel:publicEpisode.novel,outline:localEpisode.outline||publicEpisode.outline,updatedAt:publicEpisode.updatedAt}:{...publicEpisode};
+          return localEpisode?{...publicEpisode,...localEpisode,title:publicEpisode.title,status:publicEpisode.status,novel:publicEpisode.novel,outline:localEpisode.outline||publicEpisode.outline,comicPages:publicEpisode.comicPages||localEpisode.comicPages,updatedAt:publicEpisode.updatedAt}:{...publicEpisode};
         });
         mergedEpisodes.push(...(localWork.episodes||[]).filter(item=>!publicNumbers.has(Number(item.no))));
         next.works[index]={...publicWork,...localWork,episodes:mergedEpisodes,updatedAt:publicWork.updatedAt};
