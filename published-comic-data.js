@@ -8,5 +8,5 @@
     label:`P${String(index+1).padStart(2,'0')}`,
     src:`public/comics/episode-01/p${String(index+1).padStart(2,'0')}.webp`
   }));
-  published.version=`${published.version}-comic-p01-p16-v2`;
+  published.version=`${published.version}-comic-p01-p16-v3`;
 })();
