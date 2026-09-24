@@ -1,0 +1,23 @@
+(() => {
+  'use strict';
+  const PASSWORD_HASH='855fd9d6a68d9e2b4f27f9a116b4f83a433f45c6155f9bf7eea9156e770a3bb3';
+  const SESSION_KEY='story-atlas-reader-access-v1';
+  const form=document.querySelector('#accessForm');
+  const input=document.querySelector('#accessPassword');
+  const error=document.querySelector('#accessError');
+  const scripts=['published-story-data.js?v=20260910-17','published-story-overrides.js?v=20260916','published-comic-data.js?v=20260923-p01-p16-v3'];
+  let loading=false;
+  async function digest(value){const bytes=new TextEncoder().encode(value);const hash=await crypto.subtle.digest('SHA-256',bytes);return [...new Uint8Array(hash)].map(item=>item.toString(16).padStart(2,'0')).join('');}
+  function addScript(src){return new Promise((resolve,reject)=>{const script=document.createElement('script');script.src=src;script.onload=resolve;script.onerror=reject;document.head.appendChild(script);});}
+  async function loadStory(){
+    if(loading)return;loading=true;
+    try{for(const src of scripts)await addScript(src);document.body.classList.remove('reader-locked');document.querySelector('#accessGate').classList.add('unlocked');window.startComicReader();}
+    catch{loading=false;error.textContent='漫畫內容載入失敗，請稍後再試。';}
+  }
+  async function unlock(value){
+    if(await digest(value)!==PASSWORD_HASH){error.textContent='密碼不正確，請重新輸入。';input.select();return;}
+    sessionStorage.setItem(SESSION_KEY,'granted');error.textContent='';loadStory();
+  }
+  form.addEventListener('submit',event=>{event.preventDefault();unlock(input.value);});
+  if(sessionStorage.getItem(SESSION_KEY)==='granted')loadStory();
+})();

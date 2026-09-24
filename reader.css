@@ -65,5 +65,7 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.28;ba
 @keyframes gate-out{to{opacity:0;visibility:hidden;transform:scale(1.015)}}
 @media(max-width:840px){
   .reader-header{padding:10px 5vw;align-items:flex-start}.reader-brand strong{max-width:170px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.reader-actions label,.reader-actions a{display:none}.reader-actions select{max-width:145px}
+  .reader-actions #comicReaderLink{display:flex;white-space:nowrap}
   .reader-shell{display:block;width:min(680px,88vw)}.reader-index{display:none}.reader-article{padding-top:58px}.reader-article h1{font-size:34px}.novel-content{font-size:17px;line-height:1.9}
 }
+@media(max-width:560px){.reader-brand strong{display:none}.reader-actions{margin-left:auto;gap:6px}.reader-actions select{width:min(220px,calc(100vw - 132px));max-width:none;padding:0 8px}.reader-actions #comicReaderLink{padding:0 9px}}

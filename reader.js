@@ -36,6 +36,7 @@ window.startStoryReader = () => {
     const prev=document.querySelector('#prevChapter'),next=document.querySelector('#nextChapter');
     prev.disabled=index===0;next.disabled=index===episodes.length-1;
     prev.onclick=()=>render(episodes[index-1].no);next.onclick=()=>render(episodes[index+1].no);
+    document.querySelector('#comicReaderLink').href=`comic.html?chapter=${episode.no}`;
     if(push)history.pushState({chapter:episode.no},'',`?chapter=${episode.no}`);
     document.title=`第${episode.no}話｜${episode.title.replace(/^第\d+話[｜|]\s*/, '')}`;
     window.scrollTo({top:0,behavior:'smooth'});

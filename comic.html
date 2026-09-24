@@ -3,12 +3,12 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="《穿成禍國長公主，我把亡國劇本玩成了盛世》第1至19話線上閱讀。">
-  <title>穿成禍國長公主，我把亡國劇本玩成了盛世｜線上閱讀</title>
+  <meta name="description" content="《穿成禍國長公主，我把亡國劇本玩成了盛世》漫畫線上閱讀。">
+  <title>穿成禍國長公主，我把亡國劇本玩成了盛世｜漫畫閱讀</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Noto+Serif+TC:wght@500;600;700;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="reader.css?v=20260923-comic-switch">
+  <link rel="stylesheet" href="comic-reader.css?v=20260923">
 </head>
 <body class="reader-locked">
   <section class="access-gate" id="accessGate" aria-labelledby="accessTitle">
@@ -27,36 +27,33 @@
   </section>
   <div class="reading-progress" id="readingProgress"></div>
   <header class="reader-header">
-    <a class="reader-brand" href="read.html"><span>卷</span><strong>穿成禍國長公主，我把亡國劇本玩成了盛世</strong></a>
+    <a class="reader-brand" href="comic.html"><span>卷</span><strong>穿成禍國長公主，我把亡國劇本玩成了盛世</strong></a>
     <div class="reader-actions">
       <label for="chapterSelect">選擇話數</label>
       <select id="chapterSelect" aria-label="選擇話數"></select>
-      <a id="comicReaderLink" href="comic.html">漫畫版</a>
+      <a id="novelReaderLink" href="read.html">小說版</a>
       <a href="index.html">創作資料庫</a>
     </div>
   </header>
-
   <main class="reader-shell">
-    <aside class="reader-index" aria-label="話數目錄">
-      <p>EPISODE INDEX</p>
-      <h2>話數目錄</h2>
+    <aside class="reader-index" aria-label="漫畫話數目錄">
+      <p>COMIC INDEX</p>
+      <h2>漫畫目錄</h2>
       <nav id="chapterList"></nav>
     </aside>
-
-    <article class="reader-article">
+    <article class="comic-article">
       <div class="chapter-kicker" id="chapterKicker"></div>
       <h1 id="chapterTitle"></h1>
       <p class="chapter-status" id="chapterStatus"></p>
       <div class="chapter-rule"><span></span></div>
-      <div class="novel-content" id="novelContent"></div>
+      <div class="comic-pages" id="comicPages"></div>
       <nav class="chapter-nav" aria-label="前後話導覽">
         <button id="prevChapter">← 上一話</button>
         <button id="nextChapter">下一話 →</button>
       </nav>
     </article>
   </main>
-
-  <script src="reader.js?v=20260923-comic-switch"></script>
-  <script src="reader-auth.js?v=20260916"></script>
+  <script src="comic-reader.js?v=20260923"></script>
+  <script src="comic-reader-auth.js?v=20260923"></script>
 </body>
 </html>
