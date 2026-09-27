@@ -5,7 +5,7 @@
   const form=document.querySelector('#accessForm');
   const input=document.querySelector('#accessPassword');
   const error=document.querySelector('#accessError');
-  const scripts=['published-story-data.js?v=20260910-17','published-story-overrides.js?v=20260916','published-comic-data.js?v=20260927-p01-p28-v5'];
+  const scripts=['published-story-data.js?v=20260910-17','published-story-overrides.js?v=20260916','published-comic-data.js?v=20260927-p01-p29-v6'];
   let loading=false;
   async function digest(value){const bytes=new TextEncoder().encode(value);const hash=await crypto.subtle.digest('SHA-256',bytes);return [...new Uint8Array(hash)].map(item=>item.toString(16).padStart(2,'0')).join('');}
   function addScript(src){return new Promise((resolve,reject)=>{const script=document.createElement('script');script.src=src;script.onload=resolve;script.onerror=reject;document.head.appendChild(script);});}
