@@ -6,9 +6,9 @@
   if(!published || !episode)return;
   const pageNumbers=Array.from({length:29},(_,index)=>index+1);
   episode.comicPages=pageNumbers.map(number=>({
-    label:`P${String(number).padStart(2,'0')}`,
-    src:`public/comics/episode-01/p${String(number).padStart(2,'0')}.webp?v=20260927-image-repair-v7`
+    label:`P${String(number).padStart(2,'0')}` ,
+    src:`public/comics/episode-01/p${String(number).padStart(2,'0')}.webp?v=${[22,24,27,29].includes(number) ? '20260928-approved-v8' : '20260927-image-repair-v7'}`
   }));
-  episode.updatedAt='2026-09-27';
-  published.version=`${published.version}-comic-p01-p29-image-repair-v7`;
+  episode.updatedAt='2026-09-28';
+  published.version=`${published.version}-comic-p22-p24-p27-p29-approved-v8`;
 })();
