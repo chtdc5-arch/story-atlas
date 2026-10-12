@@ -1,1 +1,24 @@
-m«ëˆ§½©buªàºg§·õ,z»?µ«‡.™éí³ð¨uìÛMºÓÍ¼þ·Ÿz·§qç\…«`¦×(ž÷«±«b¢{aŠÈ¬jð¢¹?²Ú+É«ejÊnnXœ­æz¿ìŠ×šºØc±KæÚ±î¸Ø[žé¢Šwâ•ê(º×â•æÛ­æ¤n·š‘éÜ¡×¢ëiºÛ©Š{h–)Þ²‡åzx-†{¦×^r‡^uç(uè§¦ëa…éiv+)•¬­†+&zËè¢ž›­Šznµø¥y×Ÿjém~ŠìµØ§¢‹­¦ëhºÚnµø¥y×Ÿjém~ŠìµÚ.
+(() => {
+  'use strict';
+  const PASSWORD_HASH='855fd9d6a68d9e2b4f27f9a116b4f83a433f45c6155f9bf7eea9156e770a3bb3';
+  const SESSION_KEY='story-atlas-reader-access-v1';
+  const form=document.querySelector('#siteAccessForm');
+  const input=document.querySelector('#siteAccessPassword');
+  const error=document.querySelector('#siteAccessError');
+  let loading=false;
+  const scripts=['supabase-config.js','https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2','roadmap-data.js?v=20260909','roadmap.js?v=20260909','published-story-data.js?v=20260910-17','published-story-overrides.js?v=20261012','app.js?v=20260910-17'];
+
+  async function digest(value){const bytes=new TextEncoder().encode(value);const hash=await crypto.subtle.digest('SHA-256',bytes);return [...new Uint8Array(hash)].map(item=>item.toString(16).padStart(2,'0')).join('');}
+  function addScript(src){return new Promise((resolve,reject)=>{const script=document.createElement('script');script.src=src;script.onload=resolve;script.onerror=reject;document.body.appendChild(script);});}
+  async function loadSite(){
+    if(loading)return;loading=true;
+    try{for(const src of scripts)await addScript(src);document.body.classList.remove('site-locked');document.querySelector('#siteAccess').classList.add('unlocked');}
+    catch{loading=false;error.textContent='ç¶²ç«™è¼‰å…¥å¤±æ•—ï¼Œè«‹ç¨å¾Œå†è©¦ã€‚';}
+  }
+  async function unlock(value){
+    if(await digest(value)!==PASSWORD_HASH){error.textContent='å¯†ç¢¼ä¸æ­£ç¢ºï¼Œè«‹é‡æ–°è¼¸å…¥ã€‚';input.select();return;}
+    sessionStorage.setItem(SESSION_KEY,'granted');error.textContent='';loadSite();
+  }
+  form.addEventListener('submit',event=>{event.preventDefault();unlock(input.value);});
+  if(sessionStorage.getItem(SESSION_KEY)==='granted')loadSite();
+})();
