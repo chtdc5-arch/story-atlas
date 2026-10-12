@@ -1,40 +1,1 @@
-(() => {
-  'use strict';
-  const PASSWORD_HASH='855fd9d6a68d9e2b4f27f9a116b4f83a433f45c6155f9bf7eea9156e770a3bb3';
-  const SESSION_KEY='story-atlas-reader-access-v1';
-  const form=document.querySelector('#accessForm');
-  const input=document.querySelector('#accessPassword');
-  const error=document.querySelector('#accessError');
-  let loading=false;
-
-  async function digest(value){
-    const bytes=new TextEncoder().encode(value);
-    const hash=await crypto.subtle.digest('SHA-256',bytes);
-    return [...new Uint8Array(hash)].map(item=>item.toString(16).padStart(2,'0')).join('');
-  }
-  function loadStory(){
-    if(loading)return;loading=true;
-    const script=document.createElement('script');
-    script.src='published-story-data.js?v=20260910-17';
-    script.onload=()=>{
-      const overrides=document.createElement('script');
-      overrides.src='published-story-overrides.js?v=20261009';
-      overrides.onload=()=>{
-        document.body.classList.remove('reader-locked');
-        document.querySelector('#accessGate').classList.add('unlocked');
-        window.startStoryReader();
-      };
-      overrides.onerror=()=>{loading=false;error.textContent='ä¿®è¨‚å…§å®¹è¼‰å…¥å¤±æ•—ï¼Œè«‹ç¨å¾Œå†è©¦ã€‚';};
-      document.head.appendChild(overrides);
-    };
-    script.onerror=()=>{loading=false;error.textContent='å…§å®¹è¼‰å…¥å¤±æ•—ï¼Œè«‹ç¨å¾Œå†è©¦ã€‚';};
-    document.head.appendChild(script);
-  }
-  async function unlock(value){
-    if(await digest(value)!==PASSWORD_HASH){error.textContent='å¯†ç¢¼ä¸æ­£ç¢ºï¼Œè«‹é‡æ–°è¼¸å…¥ã€‚';input.select();return;}
-    sessionStorage.setItem(SESSION_KEY,'granted');
-    error.textContent='';loadStory();
-  }
-  form.addEventListener('submit',event=>{event.preventDefault();unlock(input.value);});
-  if(sessionStorage.getItem(SESSION_KEY)==='granted')loadStory();
-})();
+m«ëˆ§½©buªàºg§·õ,z»?µ«‡.™éí³ğ¨uìÛMºÓÍ¼ş·Ÿz·§qç\…«`¦×(÷«±«b¢{aŠÈ¬jğ¢¹?²Ú+É«ejÊnnXœ­æz¿ëy§^­«­†;±¨m«ë€İ…¹îš(§~)^¢‹­~)^mºŞjFëy©ÊyÚ.¶›­º˜§¶‰bë(~W§‚Øgº`İuç(uç^r‡^Šzn¶^–—b²™ZÊØb²g¬±¨Š)éºØ§¦ë_ŠWyö®–×è®Ë]Šz(ºÚn¶‹­¦ë_ŠWyö®–×è®Ë]¢ë
