@@ -20,10 +20,10 @@
   const work=published?.state?.works?.find(item=>item.id==='work-1786697622274-tznnx');
   const episode=work?.episodes?.find(item=>Number(item.no)===2);
   if(!published || !episode)return;
-  episode.comicPages=Array.from({length:31},(_,index)=>{
+  episode.comicPages=Array.from({length:22},(_,index)=>{
     const page=String(index+1).padStart(2,'0');
-    return {label:`P${page}`,src:`public/comics/episode-02/p${page}.webp?v=20261006-final-v1`};
+    return {label:`P${page}`,src:`public/comics/episode-02-20261021-remake/p${page}.webp?v=20261021-remake-final-v1`};
   });
-  episode.updatedAt='2026-10-06';
-  published.version=`${published.version}-comic-episode02-final-20261006-v1`;
+  episode.updatedAt='2026-10-21';
+  published.version=`${published.version}-comic-episode02-remake-final-20261021-v1`;
 })();
